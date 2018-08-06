@@ -9,7 +9,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLConnection;
+
 public class IncomingLinkActivity extends AppCompatActivity {
+
+    private String title;
+    private String artist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,37 +25,56 @@ public class IncomingLinkActivity extends AppCompatActivity {
 
         // Get the incoming URL from youtube
         Bundle extras = getIntent().getExtras();
-        final String url = extras.getString(Intent.EXTRA_TEXT);
+        final String link = extras.getString(Intent.EXTRA_TEXT);
 
         EditText editTitle = findViewById(R.id.editTitle);
         EditText editArtist = findViewById(R.id.editArtist);
 
         // Get the title and artist
-        RequestHttp request = new RequestHttp(url);
+        RequestHttp request = new RequestHttp(link);
         request.execute();
+
+
+
         try {
             request.get();
-            editTitle.setText(request._title);
-            editArtist.setText(request._artist);
-        }catch (Exception e)
+
+            title = request._title;
+            artist = request._artist;
+
+            editTitle.setText(title);
+            editArtist.setText(artist);
+        }
+        catch (Exception e)
         {
             System.out.println(e);
         }
 
-        // Add the event for the download button
+                // Add the event for the download button
         Button btnDownload = (Button) findViewById(R.id.buttonDownload);
 
         btnDownload.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                downloadFile(url);
+                downloadFile(link);
             }
         });
 
     }
 
-    private void downloadFile(String url)
+    private void downloadFile(String link)
     {
-        System.out.println(url);
+        System.out.println("DOWNLOAD BUTTON HAS BEEN PRESSED!!");
+        try
+        {
+            link = link.substring(17);
+            URL api = new URL("https://t1.youtube6download.top/odg/ec7526980e5e8bbb7b8b244bbf946885c78be35d/" + link);
+            DownloadFile downloadFile = new DownloadFile(api, title, artist);
+            downloadFile.execute();
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
     }
 
 }
